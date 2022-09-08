@@ -20,6 +20,8 @@
     "cheerio": "^1.0.0-rc.12",
     "dotenv": "^16.0.2",
     "got": "^11.4.1",
+    "pino": "^8.5.0",
+    "pino-pretty": "^9.1.0",
     "reflect-metadata": "^0.1.13",
     "tough-cookie": "^4.1.2",
     "typedi": "^0.10.0",

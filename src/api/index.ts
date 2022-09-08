@@ -19,15 +19,14 @@ import { decodeFromBase64 } from "../util/base64";
 import { ItemsResponseDto } from "../../type/dto/items";
 import { makeQuery, QueryParams } from "./query/make";
 import { SearchResponseDto } from "../../type/dto/search";
+import { CorrectAnswerResponseDto } from "../../type/dto/answer";
+import { logger } from "../util/logger";
 
 @Service()
 export class EbsAiClient {
   private readonly request: Got;
 
-  constructor(
-    private readonly username: string,
-    private readonly password: string
-  ) {
+  constructor() {
     const cookieJar = new CookieJar();
 
     this.request = got.extend({
@@ -43,7 +42,8 @@ export class EbsAiClient {
     return this.request.post(url, options);
   }
 
-  async setup() {
+  async auth(username: string, password: string) {
+    logger.info(`[LOGIN] ${username} 접속...`);
     let response: Response<string>, $: cheerio.CheerioAPI, hrefs: string[];
 
     response = await this.get(EBS_LOGIN_PAGE_URL);
@@ -59,8 +59,8 @@ export class EbsAiClient {
         login_uri: EBS_LOGIN_URL,
         prompt: "login",
         client_id: "ebsi",
-        i: this.username,
-        c: this.password,
+        i: username,
+        c: password,
         state,
       },
     });
@@ -98,6 +98,8 @@ export class EbsAiClient {
     await this.post(actionUrl!);
 
     await this.get(`https://ai.ebs.co.kr/ebs/ai/com/aiIndex.ebs`);
+
+    logger.info(`[LOGIN] ${username} 접속 완료...`);
   }
 
   async search({
@@ -146,13 +148,13 @@ export class EbsAiClient {
     return parseXML2JSON(decodeFromBase64(response.body));
   }
 
-  async getCorrectAnswer(id: string) {
+  async getCorrectAnswer(id: string): Promise<CorrectAnswerResponseDto> {
     const response = await this.post(EBS_ANSWER_URL, {
       form: {
         itemId: id,
       },
     });
 
-    return response.body;
+    return JSON.parse(response.body);
   }
 }

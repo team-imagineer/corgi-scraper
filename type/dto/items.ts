@@ -12,7 +12,7 @@ export type Items = {
   Size: string;
   TotalPage: string;
   TotalRow: string;
-  Item: Item[];
+  Item: Item[] | Item;
 };
 
 export type Item = {
