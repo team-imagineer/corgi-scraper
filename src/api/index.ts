@@ -12,7 +12,7 @@ import {
   EBS_ITEMS_URL,
   EBS_ANSWER_URL,
   EBS_ITEM_SEARCH_URL,
-} from "../constant";
+} from "../constant/url";
 import { ItemResponseDto } from "../../type/dto/item";
 import { parseXML2JSON } from "../util/xml";
 import { decodeFromBase64 } from "../util/base64";
