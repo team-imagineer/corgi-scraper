@@ -1,5 +1,5 @@
-import { parse } from "json2csv";
+import jsonexport from "jsonexport/dist";
 
-export const parseJSON2CSV = (obj: object) => {
-  return parse(obj);
+export const parseJSON2CSV = async (obj: object) => {
+  return jsonexport(obj);
 };

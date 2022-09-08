@@ -4,6 +4,7 @@ import path from "path";
 import { EbsAiClient } from "./api";
 import { QueryParams } from "./api/query/make";
 import { BookSchema, ProblemSchema, ProblemSetSchema } from "./schema";
+import { parseJSON2CSV } from "./util/csv";
 import { logger } from "./util/logger";
 
 export const handler = async (
@@ -46,6 +47,7 @@ export const handler = async (
 
   // 4. 문제 순서에 맞게 정렬
   const raw = book.toRaw();
+
   raw.problemSets.sort(
     (ps, _ps) => +ps.problems[0].number - +_ps.problems[0].number
   );
@@ -53,9 +55,23 @@ export const handler = async (
     ps.problems.sort((p, _p) => +p.number - +_p.number);
   });
 
-  // json file
+  // 5-1. json file
   await fs.writeFile(
     path.join(__dirname, "../data/json", `${book.title}.json`),
     JSON.stringify(raw, null, 2)
+  );
+
+  // 5-2. csv file
+  const flatten = raw.problemSets.flatMap((ps) =>
+    ps.problems.map((p) => ({
+      ...p,
+      paragraph: ps.paragraph,
+    }))
+  );
+  const csv = await parseJSON2CSV(flatten);
+
+  await fs.writeFile(
+    path.join(__dirname, "../data/csv", `${book.title}.csv`),
+    csv
   );
 };
