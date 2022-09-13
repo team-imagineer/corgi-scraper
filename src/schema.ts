@@ -15,7 +15,7 @@ export class BookSchema {
     public month: string
   ) {
     // 국어_3학년_2021년_11월
-    this.title = `${this.category}_${this.grade}학년_${this.year}년_${this.month}월`;
+    this.title = `${this.category} ${this.grade}학년 ${this.year}년 ${this.month}월`;
   }
 
   public toRaw() {

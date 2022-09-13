@@ -61,15 +61,47 @@ export const handler = async (
     JSON.stringify(raw, null, 2)
   );
 
-  // 5-2. csv file
+  // 5-2. req json file
   const flatten = raw.problemSets.flatMap((ps) =>
     ps.problems.map((p) => ({
       ...p,
       paragraph: ps.paragraph,
     }))
   );
-  const csv = await parseJSON2CSV(flatten);
 
+  await fs.writeFile(
+    path.join(__dirname, "../data/req", `${book.title}.json`),
+    JSON.stringify(
+      {
+        title: raw.title,
+        category: raw.category,
+        grade: raw.grade,
+        year: raw.year,
+        month: raw.month,
+        problems: flatten.map((f) => ({
+          title: f.title,
+          number: f.number,
+          point: f.point,
+          paragraph: {
+            rawText: f.paragraph + f.table + f.choices,
+          },
+          question: {
+            rawText: f.question,
+          },
+          answer: f.answerIndex,
+          explanation: {
+            rawText: f.explanation,
+          },
+        })),
+      },
+      null,
+      2
+    )
+  );
+
+  // 5-3. csv file
+
+  const csv = await parseJSON2CSV(flatten);
   await fs.writeFile(
     path.join(__dirname, "../data/csv", `${book.title}.csv`),
     csv
