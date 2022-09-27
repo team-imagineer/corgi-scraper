@@ -103,11 +103,7 @@ export class ProblemSchema {
   public title: string;
   public number: string;
   public point: string;
-  public category1: string;
-  public category2: string;
-  public category3: string;
-  public category4: string;
-  public category5: string;
+  public category: string;
   public wrongRate: string;
 
   public question: string;
@@ -115,6 +111,7 @@ export class ProblemSchema {
   public choices: string;
   public answerIndex: string;
   public explanation: string;
+  public itemCategory: string;
 
   public static createManyFromSearchResponse(
     searchResponse: SearchResponseDto
@@ -128,12 +125,14 @@ export class ProblemSchema {
       problem.title = item.title;
       problem.number = item.item_number;
       problem.point = item.point;
-      problem.category1 = item.cate_nm_1;
-      problem.category2 = item.cate_nm_2;
-      problem.category3 = item.cate_nm_3;
-      problem.category4 = item.cate_nm_4;
-      problem.category5 = item.cate_nm_5;
       problem.wrongRate = item.wrong_rate;
+      problem.category = [
+        item.cate_nm_1,
+        item.cate_nm_2,
+        item.cate_nm_3,
+        item.cate_nm_4,
+        item.cate_nm_5,
+      ].join("/");
 
       problems.push(problem);
     });
@@ -159,6 +158,17 @@ export class ProblemSchema {
       itemResponse.Item.LML.Question.Explanation,
       "Text"
     ).join("");
+
+    /**
+     * @9월 27일: 요청사항 - 작품명 카테고리 추가
+     */
+    if (Array.isArray(itemResponse.Item.ItemIndexes.ItemIndex)) {
+      this.itemCategory = itemResponse.Item.ItemIndexes.ItemIndex.map(
+        (idx) => idx.YearName || ""
+      ).join(",");
+    } else {
+      this.itemCategory = itemResponse.Item.ItemIndexes.ItemIndex.YearID;
+    }
   }
 
   public updateWithCorrectAnswerResponse(
@@ -172,13 +182,9 @@ export class ProblemSchema {
       title: this.title,
       number: this.number,
       point: this.point,
-      category1: this.category1,
-      category2: this.category2,
-      category3: this.category3,
-      category4: this.category4,
-      category5: this.category5,
+      category: this.category,
+      itemCategory: this.itemCategory,
       wrongRate: this.wrongRate,
-
       question: this.question,
       table: this.table,
       choices: this.choices,

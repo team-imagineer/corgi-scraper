@@ -81,6 +81,8 @@ export const handler = async (
         problems: flatten.map((f) => ({
           title: f.title,
           number: f.number,
+          category: f.category,
+          itemCategory: f.itemCategory,
           point: f.point,
           paragraph: {
             rawText: f.paragraph + f.table + f.choices,
